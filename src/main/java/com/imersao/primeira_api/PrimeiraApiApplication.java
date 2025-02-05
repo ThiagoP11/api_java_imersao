@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class PrimeiraApiApplication {
 
 	public static void main(String[] args) {
+		//teste
 		SpringApplication.run(PrimeiraApiApplication.class, args);
 	}
 

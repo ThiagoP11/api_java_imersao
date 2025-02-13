@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -41,7 +43,16 @@ public class CondominoEntity {
     @Column
     private String cpf;
 
-
+    public CondominoEntity(CondominoDTO condominoDTO) {
+        this.id = UUID.randomUUID().toString();
+        this.apto = condominoDTO.getApto();
+        this.cpf = condominoDTO.getCpf();
+        this.bloco = condominoDTO.getBloco();
+        this.email = condominoDTO.getEmail();
+        this.nome = condominoDTO.getNome();
+        this.dddCelular = condominoDTO.getDddCelular();
+        this.numeroCelular = condominoDTO.getNumeroCelular();
+    }
 
 
 }

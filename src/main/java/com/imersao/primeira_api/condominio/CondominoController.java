@@ -20,6 +20,14 @@ public class CondominoController {
     @ResponseStatus(HttpStatus.CREATED)
     public CondominoDTO cadastrarCondomino(@Valid @RequestBody CondominoDTO condominoDTO){
 
+        validarNovoCondomino(condominoDTO);
+
+
+        return new CondominoDTO(repository.save(new CondominoEntity(condominoDTO)));
+
+    }
+
+    private void validarNovoCondomino(final CondominoDTO condominoDTO) {
         if(repository.findByCpf(condominoDTO.getCpf()).isPresent()){
             throw new RegraDeNegocioException("CPF já cadastrado, utilize a rota de alteração");
         }
@@ -28,23 +36,6 @@ public class CondominoController {
         if (repository.findByEmail(condominoDTO.getEmail()).isPresent()){
             throw new RegraDeNegocioException("E-mail já cadastrado, utilize a rota de alteração ou e-mail diferente");
         }
-
-
-        CondominoEntity entity = new CondominoEntity();
-        entity.setId(UUID.randomUUID().toString());
-        entity.setApto(condominoDTO.getApto());
-        entity.setCpf(condominoDTO.getCpf());
-        entity.setBloco(condominoDTO.getBloco());
-        entity.setEmail(condominoDTO.getEmail());
-        entity.setNome(condominoDTO.getNome());
-        entity.setDddCelular(condominoDTO.getDddCelular());
-        entity.setNumeroCelular(condominoDTO.getNumeroCelular());
-
-        CondominoEntity entitySalva = repository.save(entity);
-        condominoDTO.setId(entitySalva.getId());
-
-        return condominoDTO;
-
     }
 
     @PutMapping("/condomino/{id}")
@@ -56,6 +47,12 @@ public class CondominoController {
 
         CondominoEntity entity = repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Condomino não encontrado"));
 
+        validarAtualizacao(condominoDTO, entity);
+
+        return new CondominoDTO(repository.save(new CondominoEntity(condominoDTO)));
+    }
+
+    private void validarAtualizacao(CondominoDTO condominoDTO, CondominoEntity entity) {
         if(!Objects.equals(entity.getEmail(), condominoDTO.getEmail())){
             if (repository.findByEmail(condominoDTO.getEmail()).isPresent()){
                 throw new RegraDeNegocioException("E-mail já cadastrado, utilize um e-mail diferente");
@@ -65,59 +62,22 @@ public class CondominoController {
         if (!Objects.equals(entity.getCpf(), condominoDTO.getCpf())){
                 throw new RegraDeNegocioException("Não é possivel alterar o CPF");
         }
-
-        entity.setApto(condominoDTO.getApto());
-        entity.setCpf(condominoDTO.getCpf());
-        entity.setBloco(condominoDTO.getBloco());
-        entity.setEmail(condominoDTO.getEmail());
-        entity.setNome(condominoDTO.getNome());
-        entity.setDddCelular(condominoDTO.getDddCelular());
-        entity.setNumeroCelular(condominoDTO.getNumeroCelular());
-
-        repository.save(entity);
-
-        return condominoDTO;
     }
 
     @GetMapping("condomino/{cpf}")
     @ResponseStatus(HttpStatus.OK)
     public CondominoDTO consultarPorCPF(@PathVariable("cpf") String cpf){
-        CondominoEntity entity = repository.findByCpf(cpf).
-                orElseThrow(() -> new RecursoNaoEncontradoException("Condomino não localizado"));
-
-        CondominoDTO dto = new CondominoDTO();
-
-        dto.setId(entity.getId());
-        dto.setCpf(entity.getCpf());
-        dto.setApto(entity.getApto());
-        dto.setNome(entity.getNome());
-        dto.setBloco(entity.getBloco());
-        dto.setDddCelular(entity.getDddCelular());
-        dto.setNumeroCelular(entity.getNumeroCelular());
-        dto.setEmail(entity.getEmail());
-
-        return dto;
+        return new CondominoDTO(repository.findByCpf(cpf).
+                orElseThrow(() -> new RecursoNaoEncontradoException("Condomino não localizado")));
     }
 
     @GetMapping("condomino")
     @ResponseStatus(HttpStatus.OK)
     public List<CondominoDTO> consultarTodo() {
-        List<CondominoEntity> entities = repository.findAll();
         List<CondominoDTO> dtos= new ArrayList<>();
-        entities.forEach(entity -> {
-            CondominoDTO dto = new CondominoDTO();
 
-
-            dto.setId(entity.getId());
-            dto.setCpf(entity.getCpf());
-            dto.setApto(entity.getApto());
-            dto.setNome(entity.getNome());
-            dto.setBloco(entity.getBloco());
-            dto.setDddCelular(entity.getDddCelular());
-            dto.setNumeroCelular(entity.getNumeroCelular());
-            dto.setEmail(entity.getEmail());
-
-            dtos.add(dto);
+        repository.findAll().forEach(entity -> {
+            dtos.add(new CondominoDTO(entity));
         });
 
         return dtos;

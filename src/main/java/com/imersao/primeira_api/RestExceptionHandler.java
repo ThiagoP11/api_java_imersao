@@ -1,5 +1,7 @@
 package com.imersao.primeira_api;
 
+import com.imersao.primeira_api.condominio.RecursoNaoEncontradoException;
+import com.imersao.primeira_api.condominio.RegraDeNegocioException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,5 +28,19 @@ public class RestExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return errors;
+    }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(RegraDeNegocioException.class)
+    @ResponseBody
+    public String handlerRegraDeNegocioException(RegraDeNegocioException exception){
+        return exception.getMessage();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(RecursoNaoEncontradoException.class)
+    @ResponseBody
+    public String handlerRegraDeNegocioException(RecursoNaoEncontradoException exception){
+        return exception.getMessage();
     }
 }

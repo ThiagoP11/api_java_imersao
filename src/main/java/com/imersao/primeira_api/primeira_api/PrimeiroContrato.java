@@ -1,4 +1,4 @@
-package com.imersao.primeira_api;
+package com.imersao.primeira_api.primeira_api;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
